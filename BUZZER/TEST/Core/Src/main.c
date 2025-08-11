@@ -43,6 +43,7 @@
 
 /* Private variables ---------------------------------------------------------*/
 TIM_HandleTypeDef htim2;
+TIM_HandleTypeDef htim4;
 
 UART_HandleTypeDef huart1;
 
@@ -55,6 +56,7 @@ void SystemClock_Config(void);
 static void MX_GPIO_Init(void);
 static void MX_USART1_UART_Init(void);
 static void MX_TIM2_Init(void);
+static void MX_TIM4_Init(void);
 /* USER CODE BEGIN PFP */
 
 /* USER CODE END PFP */
@@ -140,30 +142,32 @@ void handlSlideSwitch()
 }
 
 //--------------------------------------------------------------------------
-void handlSlideToBuzzer()
-{
-	/*GPIO_PinState btnState = HAL_GPIO_ReadPin(SlideSwitch_GPIO_Port, SlideSwitch_Pin);
-	if (btnState == GPIO_PIN_SET)
-	{
-		HAL_TIM_PWM_Start(&htim2, TIM_CHANNEL_1);
-		__HAL_TIM_SET_COMPARE(&htim2, TIM_CHANNEL_1, 250);
-	}
-	else
-	{
-		HAL_TIM_PWM_Stop(&htim2, TIM_CHANNEL_1);
-	}*/
-}
-//--------------------------------------------------------------------------
-/*void RGB_SetColor(uint8_t r, uint8_t g, uint8_t b) {
+void RGB_SetColor(uint8_t r, uint8_t g, uint8_t b) {
     __HAL_TIM_SET_COMPARE(&htim4, TIM_CHANNEL_1, r); // Красный
     __HAL_TIM_SET_COMPARE(&htim4, TIM_CHANNEL_2, g); // Зелёный
     __HAL_TIM_SET_COMPARE(&htim4, TIM_CHANNEL_3, b); // Синий
-}*/
+}
 //---------------------------------------------------------------------------
 
 void Buzzer_SetDuty(uint16_t duty) {
     if (duty > htim2.Init.Period) duty = htim2.Init.Period;
     __HAL_TIM_SET_COMPARE(&htim2, TIM_CHANNEL_1, duty);
+}
+
+
+//--------------------------------------------------------------------------
+void handlSlideToBuzzer()
+{
+	GPIO_PinState btnState = HAL_GPIO_ReadPin(SlideSwitch_GPIO_Port, SlideSwitch_Pin);
+	if (btnState == GPIO_PIN_SET)
+	{
+		 HAL_TIM_PWM_Start(&htim2, TIM_CHANNEL_1);
+		 Buzzer_SetDuty( (htim2.Init.Period + 1) / 2 );
+	}
+	else
+	{
+		HAL_TIM_PWM_Stop(&htim2, TIM_CHANNEL_1);
+	}
 }
 
 //-------------------------------------------------------------------------
@@ -201,8 +205,12 @@ int main(void)
   MX_GPIO_Init();
   MX_USART1_UART_Init();
   MX_TIM2_Init();
+  MX_TIM4_Init();
   /* USER CODE BEGIN 2 */
-  HAL_TIM_PWM_Start(&htim2, TIM_CHANNEL_1);
+
+  HAL_TIM_PWM_Start(&htim4, TIM_CHANNEL_1);
+  HAL_TIM_PWM_Start(&htim4, TIM_CHANNEL_2);
+  HAL_TIM_PWM_Start(&htim4, TIM_CHANNEL_3);
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -214,11 +222,22 @@ int main(void)
 
 	  prinLedStatus();
 	  handlSlideSwitch();
-	//  handlSlideToBuzzer();
+
+
+	  handlSlideToBuzzer();
+	  RGB_SetColor(255, 0, 0);   // Красный
+	      HAL_Delay(500);
+	      RGB_SetColor(0, 255, 0);   // Зелёный
+	      HAL_Delay(500);
+	      RGB_SetColor(0, 0, 255);   // Синий
+	      HAL_Delay(500);
+	      RGB_SetColor(255, 255, 255); // Белый
+	      HAL_Delay(500);
+
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
-	  Buzzer_SetDuty( (htim2.Init.Period + 1) / 2 );
+
   }
   /* USER CODE END 3 */
 }
@@ -307,6 +326,69 @@ static void MX_TIM2_Init(void)
 
   /* USER CODE END TIM2_Init 2 */
   HAL_TIM_MspPostInit(&htim2);
+
+}
+
+/**
+  * @brief TIM4 Initialization Function
+  * @param None
+  * @retval None
+  */
+static void MX_TIM4_Init(void)
+{
+
+  /* USER CODE BEGIN TIM4_Init 0 */
+
+  /* USER CODE END TIM4_Init 0 */
+
+  TIM_MasterConfigTypeDef sMasterConfig = {0};
+  TIM_OC_InitTypeDef sConfigOC = {0};
+
+  /* USER CODE BEGIN TIM4_Init 1 */
+
+  /* USER CODE END TIM4_Init 1 */
+  htim4.Instance = TIM4;
+  htim4.Init.Prescaler = 63;
+  htim4.Init.CounterMode = TIM_COUNTERMODE_UP;
+  htim4.Init.Period = 255;
+  htim4.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
+  htim4.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
+  if (HAL_TIM_OC_Init(&htim4) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  if (HAL_TIM_PWM_Init(&htim4) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  sMasterConfig.MasterOutputTrigger = TIM_TRGO_RESET;
+  sMasterConfig.MasterSlaveMode = TIM_MASTERSLAVEMODE_DISABLE;
+  if (HAL_TIMEx_MasterConfigSynchronization(&htim4, &sMasterConfig) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  sConfigOC.OCMode = TIM_OCMODE_TIMING;
+  sConfigOC.Pulse = 0;
+  sConfigOC.OCPolarity = TIM_OCPOLARITY_HIGH;
+  sConfigOC.OCFastMode = TIM_OCFAST_DISABLE;
+  if (HAL_TIM_OC_ConfigChannel(&htim4, &sConfigOC, TIM_CHANNEL_1) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  sConfigOC.OCMode = TIM_OCMODE_PWM1;
+  if (HAL_TIM_PWM_ConfigChannel(&htim4, &sConfigOC, TIM_CHANNEL_2) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  sConfigOC.OCMode = TIM_OCMODE_TIMING;
+  if (HAL_TIM_OC_ConfigChannel(&htim4, &sConfigOC, TIM_CHANNEL_3) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  /* USER CODE BEGIN TIM4_Init 2 */
+
+  /* USER CODE END TIM4_Init 2 */
+  HAL_TIM_MspPostInit(&htim4);
 
 }
 
