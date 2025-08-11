@@ -1,0 +1,13 @@
+../Core/Src/main.c:68:5:_write	4
+../Core/Src/main.c:87:6:prinLedStatus	3
+../Core/Src/main.c:103:6:HandleButtons	6
+../Core/Src/main.c:123:6:HAL_GPIO_EXTI_Callback	1
+../Core/Src/main.c:129:6:handlSlideSwitch	2
+../Core/Src/main.c:143:6:handlSlideToBuzzer	1
+../Core/Src/main.c:157:6:RGB_SetColor	1
+../Core/Src/main.c:172:5:main	1
+../Core/Src/main.c:237:6:SystemClock_Config	3
+../Core/Src/main.c:276:13:MX_TIM4_Init	6
+../Core/Src/main.c:333:13:MX_USART1_UART_Init	2
+../Core/Src/main.c:366:13:MX_GPIO_Init	1
+../Core/Src/main.c:439:6:Error_Handler	1
