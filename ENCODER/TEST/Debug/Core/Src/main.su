@@ -1,0 +1,17 @@
+../Core/Src/main.c:72:5:_write	32	static
+../Core/Src/main.c:91:6:prinLedStatus	16	static
+../Core/Src/main.c:107:6:HandleButtons	16	static
+../Core/Src/main.c:127:6:HAL_GPIO_EXTI_Callback	16	static
+../Core/Src/main.c:133:6:handlSlideSwitch	16	static
+../Core/Src/main.c:147:6:RGB_SetColor	16	static
+../Core/Src/main.c:154:6:Buzzer_SetDuty	16	static
+../Core/Src/main.c:161:6:handlSlideToBuzzer	16	static
+../Core/Src/main.c:180:6:UpdateEncoder	16	static
+../Core/Src/main.c:221:5:main	8	static
+../Core/Src/main.c:296:6:SystemClock_Config	72	static
+../Core/Src/main.c:335:13:MX_TIM2_Init	48	static
+../Core/Src/main.c:384:13:MX_TIM3_Init	56	static
+../Core/Src/main.c:433:13:MX_TIM4_Init	48	static
+../Core/Src/main.c:490:13:MX_USART1_UART_Init	8	static
+../Core/Src/main.c:523:13:MX_GPIO_Init	40	static
+../Core/Src/main.c:596:6:Error_Handler	4	static,ignoring_inline_asm
